@@ -3,28 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- webapp -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Porky's Game">
 
-  <link rel="apple-touch-icon" href="icon-180.png">
-  <link rel="manifest" href="manifest.json">
-<title>Porky's Game - Carte</title>
+<title>Gioco Carte – Estrazione</title>
 
-<!-- JSZip -->
+<!-- Librerie -->
 <script src="js/jszip.min.js"></script>
+<script src="js/localforage.min.js"></script>
 
 <style>
 body {
-  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-family: Arial, sans-serif;
+  background:
+    linear-gradient(rgba(20,10,0,.8), rgba(20,10,0,.8)),
+    url("images/Nuovo_logo_carte.png") center/cover no-repeat;
   color: #f5e6b3;
   text-align: center;
-  padding: 10px;
-  background:
-    linear-gradient(rgba(20,10,0,.75), rgba(20,10,0,.75)),
-    url("Nuovo_logo_carte.png") center/cover no-repeat;
   min-height: 100vh;
+  padding: 20px;
 }
 
 h1 {
@@ -32,26 +27,14 @@ h1 {
   text-shadow: 0 0 10px rgba(245,197,66,.6);
 }
 
-.cards-wrapper h1,
-.cards-wrapper .info,
-.cards-wrapper button {
-  color: #502369;
-}
-
-.cards-wrapper .carta {
-  width: 180px;
-  margin: 15px auto;
-}
-
 button {
-  padding: 10px;
-  margin: 5px;
+  padding: 10px 16px;
+  margin: 6px;
   font-size: 16px;
+  font-weight: bold;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  
 }
 
 .btn {
@@ -59,56 +42,38 @@ button {
   color: #3b2500;
 }
 
-.btn:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
-
 .reset {
   background: linear-gradient(145deg, #b00b0b, #910101);
   color: #fff;
 }
-.reset:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
-.cancellaMazzo {
-  background: linear-gradient(145deg, #b00b0b, #910101);
-  color: #fff;
-}
-.cancellaMazzo:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
 
 .info {
-  margin-top: 10px;
+  margin: 15px;
   font-size: 18px;
 }
 
 .carta {
-  width: 180px;
-  height: 300px;
+  width: 200px;
+  height: 320px;
   margin: 20px auto;
-  border-radius: 10px;
+  border-radius: 12px;
   background:
     radial-gradient(circle at top, rgba(255,215,120,.35), rgba(80,0,40,.9));
-  background-image: url('Nuovo_logo_carte.png');
+  background-image: url('images/Nuovo_logo_carte.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+  box-shadow: 0 0 15px rgba(245,197,66,.4),
+              inset 0 0 10px rgba(0,0,0,.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(245,197,66,.4),
-              inset 0 0 10px rgba(0,0,0,.5);
 }
 
 .carta img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .shuffle {
@@ -123,123 +88,117 @@ button {
   100% { transform: rotateZ(0deg); }
 }
 
-/* input file nascosti */
 input[type="file"] {
   display: none;
+}
+
+/* MODAL */
+#modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+#modalBox {
+  background: #f9e0a7;
+  border: 4px solid #502369;
+  border-radius: 14px;
+  padding: 25px;
+  min-width: 280px;
+  color: #502369;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Porky's Game</h1>
+<h1>Gioco di Estrazione Carte</h1>
 
 <div>
-  <button class="btn" onclick="apriZip()">Carica mazzo</button>
-  <button class="btn" onclick="document.getElementById('imgInput').click()">Aggiungi carte</button>
-
+  <button class="btn" onclick="apriZip()">Carica mazzo (ZIP)</button>
+  <button class="btn" onclick="imgInput.click()">Aggiungi carte</button>
 
   <input type="file" id="zipInput" accept=".zip" multiple>
   <input type="file" id="imgInput" accept="image/*" multiple>
 </div>
 
 <div class="info">
-  Carte nel mazzo: <span id="contatore">0</span>
+  Carte disponibili: <span id="contatore">0</span>
 </div>
 
 <div id="cartaEstratta" class="carta"></div>
 
-<button class="btn" onclick="estraiCarta()">ESTRAI</button>
-<button class="reset" onclick="resetPartita()">RESET</button>
-<button class="cancellaMazzo" id="cancellaMazzoBtn">CANCELLA MAZZO</button>
+<div>
+  <button class="btn" onclick="estraiCarta()">ESTRAI</button>
+  <button class="btn" onclick="resetEstrazioni()">RESET ESTRAZIONI</button>
+  <button class="reset" onclick="cancellaMazzo()">CANCELLA MAZZO</button>
 </div>
 
+<!-- MODAL -->
+<div id="modalOverlay">
+  <div id="modalBox">
+    <div id="modalText"></div><br>
+    <button id="modalOk" class="reset">OK</button>
+    <button id="modalCancel" class="btn">ANNULLA</button>
+  </div>
+</div>
 
-<script src="js/jszip.min.js"></script>  
 <script>
-document.getElementById("cancellaMazzoBtn").addEventListener("click", () => {
-
-  customConfirm(
-    "Vuoi cancellare TUTTO il mazzo di carte?\n\n" +
-    "La partita e i giocatori NON verranno toccati."
-  ).then(ok => {
-
-    if (!ok) {
-      forzaFocusInput();
-      return;
-    }
-
-    // cancella SOLO carte
-    mazzo = [];
-    carteEstratte = [];
-    localStorage.removeItem("mazzo");
-
-    resetCartaVisuale();
-    aggiornaContatore();
-
-    customAlert("Mazzo cancellato correttamente.");
-  });
-
+/* ================= DATABASE ================= */
+localforage.config({
+  name: 'GiocoCarte',
+  storeName: 'mazzo'
 });
 
 let mazzo = [];
-let carteEstratte = [];
 
+const contatore = document.getElementById("contatore");
+const cartaEstratta = document.getElementById("cartaEstratta");
 const zipInput = document.getElementById("zipInput");
 const imgInput = document.getElementById("imgInput");
 
-/* ----------- UTIL ----------- */
+/* ================= UTILS ================= */
 function aggiornaContatore() {
-  contatore.innerText = mazzo.filter(c => !c.estratta).length;
+  contatore.textContent = mazzo.filter(c => !c.estratta).length;
 }
 
-function salvaCarte() {
-  const stato = mazzo.map(c => ({
-    nome: c.nome,
-    estratta: c.estratta
-  }));
-  localStorage.setItem("mazzo", JSON.stringify(stato));
-}
-
-function resetCartaVisuale() {
+function resetCarta() {
   cartaEstratta.innerHTML = "";
 }
 
-function ripristinaStatoCarte() {
-  const salvato = JSON.parse(localStorage.getItem("mazzo"));
-  if (!salvato) return;
-
-  salvato.forEach(s => {
-    const carta = mazzo.find(c => c.nome === s.nome);
-    if (carta) carta.estratta = s.estratta;
-  });
+async function salvaMazzo() {
+  await localforage.setItem("mazzo", mazzo);
 }
 
-/* ----------- ZIP ----------- */
+async function caricaMazzo() {
+  const salvato = await localforage.getItem("mazzo");
+  if (salvato && Array.isArray(salvato)) {
+    mazzo = salvato;
+    aggiornaContatore();
+  }
+}
+
+/* ================= ZIP ================= */
+function apriZip() {
+  zipInput.value = "";
+  zipInput.click();
+}
+
 zipInput.addEventListener("change", async () => {
-  const files = [...zipInput.files];
-  if (!files.length) return;
-
-  for (const file of files) {
-
-    if (!file.name.toLowerCase().endsWith(".zip")) {
-      customAlert(`Il file ${file.name} non è uno ZIP valido`);
-      continue;
-    }
+  for (const file of zipInput.files) {
+    if (!file.name.endsWith(".zip")) continue;
 
     const zip = await JSZip.loadAsync(file);
-
     const immagini = Object.values(zip.files)
-      .filter(f => !f.dir && /\.(png|jpe?g|webp)$/i.test(f.name))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .filter(f => !f.dir && /\.(png|jpe?g|webp)$/i.test(f.name));
 
     for (const img of immagini) {
-
-      // evita duplicati (stesso nome file)
       if (mazzo.some(c => c.nome === img.name)) continue;
 
       const base64 = await img.async("base64");
-
       mazzo.push({
         nome: img.name,
         img: `data:image/png;base64,${base64}`,
@@ -247,18 +206,14 @@ zipInput.addEventListener("change", async () => {
       });
     }
   }
-  ripristinaStatoCarte(); 
+  await salvaMazzo();
   aggiornaContatore();
-  resetCartaVisuale();
-  salvaCarte();
-  zipInput.value = "";
+  resetCarta();
 });
 
-/* ----------- IMMAGINI SINGOLE ----------- */
-imgInput.addEventListener("change", () => {
-  const files = imgInput.files;
-
-  for (const file of files) {
+/* ================= IMMAGINI ================= */
+imgInput.addEventListener("change", async () => {
+  for (const file of imgInput.files) {
     if (!file.type.startsWith("image/")) continue;
     if (mazzo.some(c => c.nome === file.name)) continue;
 
@@ -269,18 +224,14 @@ imgInput.addEventListener("change", () => {
         img: e.target.result,
         estratta: false
       });
-      ripristinaStatoCarte(); 
+      salvaMazzo();
       aggiornaContatore();
-      resetCartaVisuale();
-      salvaCarte();
     };
     reader.readAsDataURL(file);
   }
-
-  imgInput.value = "";
 });
 
-/* ----------- GIOCO ----------- */
+/* ================= GIOCO ================= */
 function estraiCarta() {
   const disponibili = mazzo.filter(c => !c.estratta);
   if (!disponibili.length) {
@@ -289,152 +240,66 @@ function estraiCarta() {
   }
 
   cartaEstratta.classList.add("shuffle");
-
   setTimeout(() => {
     cartaEstratta.classList.remove("shuffle");
     const carta = disponibili[Math.floor(Math.random() * disponibili.length)];
     carta.estratta = true;
     cartaEstratta.innerHTML = `<img src="${carta.img}">`;
     aggiornaContatore();
-    salvaCarte();
-  }, 800);
+    salvaMazzo();
+  }, 700);
 }
 
-function resetPartita() {
+function resetEstrazioni() {
   mazzo.forEach(c => c.estratta = false);
-  carteEstratte = [];
-  resetCartaVisuale();
+  resetCarta();
   aggiornaContatore();
-  salvaCarte();
+  salvaMazzo();
 }
-window.estraiCarta = estraiCarta;
-window.resetPartita = resetPartita;
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+
+function cancellaMazzo() {
+  customConfirm("Vuoi cancellare tutto il mazzo?")
+    .then(ok => {
+      if (!ok) return;
+      mazzo = [];
+      resetCarta();
+      aggiornaContatore();
+      localforage.removeItem("mazzo");
+    });
 }
-function customConfirm(message) {
-  return new Promise(function (resolve) {
 
-    const overlay = document.getElementById("modalOverlay");
-    const text = document.getElementById("modalText");
-    const okBtn = document.getElementById("modalOk");
-    const cancelBtn = document.getElementById("modalCancel");
-    const kBtn = document.getElementById("notifica");
-
-    okBtn.style.display = "inline-block";
-    cancelBtn.style.display = "inline-block";
-    kBtn.style.display = "none";
-    text.textContent = message;
-    overlay.style.display = "flex";
-
-    okBtn.focus();
-
-    function close(result) {
-      overlay.style.display = "none";
-
-      okBtn.removeEventListener("click", onOk);
-      cancelBtn.removeEventListener("click", onCancel);
-      document.removeEventListener("keydown", onKey);
-
-      resolve(result);
-    }
-
-    function onOk() {
-      close(true);
-    }
-
-    function onCancel() {
-      close(false);
-    }
-
-    function onKey(e) {
-      if (e.key === "Enter") close(true);
-      if (e.key === "Escape") close(false);
-    }
-
-    okBtn.addEventListener("click", onOk);
-    cancelBtn.addEventListener("click", onCancel);
-    document.addEventListener("keydown", onKey);
+/* ================= MODAL ================= */
+function customAlert(msg) {
+  return new Promise(res => {
+    modalText.textContent = msg;
+    modalCancel.style.display = "none";
+    modalOverlay.style.display = "flex";
+    modalOk.onclick = () => {
+      modalOverlay.style.display = "none";
+      modalCancel.style.display = "inline-block";
+      res();
+    };
   });
 }
-</script>
-<script>
-function customAlert(message) {
-  return new Promise(function (resolve) {
 
-    const overlay = document.getElementById("modalOverlay");
-    const text = document.getElementById("modalText");
-    const okBtn = document.getElementById("modalOk");
-    const cancelBtn = document.getElementById("modalCancel");
-    const kBtn = document.getElementById("notifica");
-
-    okBtn.style.display = "none";
-    cancelBtn.style.display = "none";
-    kBtn.style.display = "inline-block";
-    text.textContent = message;
-    overlay.style.display = "flex";
-
-    kBtn.focus();
-
-    function close() {
-      overlay.style.display = "none";
-      okBtn.style.display = "inline-block";
-      cancelBtn.style.display = "inline-block";
-      kBtn.style.display = "none";
-
-      kBtn.removeEventListener("click", onOk);
-      document.removeEventListener("keydown", onKey);
-
-      resolve();
-    }
-
-    function onOk() {
-      close();
-    }
-
-    function onKey(e) {
-      if (e.key === "Enter" || e.key === "Escape") close();
-    }
-
-    kBtn.addEventListener("click", onOk);
-    document.addEventListener("keydown", onKey);
+function customConfirm(msg) {
+  return new Promise(res => {
+    modalText.textContent = msg;
+    modalOverlay.style.display = "flex";
+    modalOk.onclick = () => {
+      modalOverlay.style.display = "none";
+      res(true);
+    };
+    modalCancel.onclick = () => {
+      modalOverlay.style.display = "none";
+      res(false);
+    };
   });
 }
-</script>
-<script>
-function apriZip() {
-  zipInput.value = "";   // 🔑 reset fondamentale
-  zipInput.click();
-}
+
+/* ================= AVVIO ================= */
+window.addEventListener("load", caricaMazzo);
 </script>
 
-<div id="modalOverlay" style="
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10000;
-">
-  <div style="
-    background:#f9e0a7;
-    border:4px solid #502369;
-    border-radius:14px;
-    padding:25px;
-    min-width:280px;
-    text-align:center;
-    font-size:18px;
-    color:#502369;
-  ">
-    <div id="modalText" style="margin-bottom:20px;"></div>
-    <button id="modalOk" class="reset">SI</button>
-    <button id="modalCancel" class="btn">NO</button>
-    <button id="notifica" class="btn">OK</button>
-  </div>
-</div>
 </body>
 </html>
-
