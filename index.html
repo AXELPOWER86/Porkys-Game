@@ -9,15 +9,15 @@
                maximum-scale=3.0,
                user-scalable=yes">
 
-<title>Porky's Game – Carte</title>
+<title>Porky's Game - Carte</title>
 
-<!-- LIBRERIE -->
+<!-- LIBRERIE IDENTICHE AL TABELLONE -->
 <script src="js/jszip.min.js"></script>
 <script src="js/localforage.min.js"></script>
 
 <style>
 
-/* ===== STILE IDENTICO AL TABELLONE ===== */
+/* ===== GRAFICA IDENTICA AL TABELLONE EXTREME ===== */
 
 body {
   font-family: Arial, sans-serif;
@@ -77,6 +77,11 @@ button {
   color: #fff;
 }
 
+.cancellaMazzo:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+}
+
 /* CARTA IDENTICA */
 .carta {
   width: 180px;
@@ -103,7 +108,6 @@ button {
   border-radius: 10px;
 }
 
-/* ANIMAZIONE MESCOLA */
 .shuffle {
   animation: shake .5s infinite;
 }
@@ -116,7 +120,6 @@ button {
   100% { transform: rotateZ(0deg); }
 }
 
-/* INFO */
 .info {
   margin-top: 10px;
   font-size: 18px;
@@ -129,7 +132,7 @@ input[type="file"] {
   display: none;
 }
 
-/* ===== MODAL IDENTICA ===== */
+/* ===== MODAL IDENTICA AL TABELLONE ===== */
 #modalOverlay {
   position: fixed;
   inset: 0;
@@ -159,11 +162,12 @@ input[type="file"] {
 <h1>Porky's Game – Carte</h1>
 
 <div>
-  <button class="btn" onclick="apriZip()">Carica mazzo (ZIP)</button>
-  <button class="btn" onclick="imgInput.click()">Aggiungi carte</button>
+  <button class="btn" onclick="apriZip()">Carica mazzo</button>
+  <button class="btn" onclick="document.getElementById('imgInput').click()">Aggiungi carte</button>
 
   <input type="file" id="zipInput" accept=".zip" multiple>
-  <input type="file" id="imgInput"
+  <input type="file"
+         id="imgInput"
          accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
          multiple>
 </div>
@@ -176,22 +180,35 @@ input[type="file"] {
 
 <div>
   <button class="btn" onclick="estraiCarta()">ESTRAI</button>
-  <button class="btn" onclick="resetEstrazioni()">RESET</button>
-  <button class="cancellaMazzo" onclick="cancellaMazzo()">CANCELLA MAZZO</button>
+  <button class="reset" onclick="resetPartita()">RESET</button>
+  <button class="cancellaMazzo" id="cancellaMazzoBtn">CANCELLA MAZZO</button>
+</div>
+
+<div style="margin-top:15px;">
+  <button id="backBtn"
+          style="
+            padding:10px 15px;
+            background:#01893a;
+            color:white;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;">
+    ⬅ Home Page
+  </button>
 </div>
 
 <!-- MODAL -->
 <div id="modalOverlay">
   <div id="modalBox">
     <div id="modalText"></div><br>
-    <button id="modalOk" class="reset">OK</button>
-    <button id="modalCancel" class="btn">ANNULLA</button>
+    <button id="modalOk" class="reset">SI</button>
+    <button id="modalCancel" class="btn">NO</button>
   </div>
 </div>
 
 <script>
 
-/* ===== DATABASE IDENTICO AL TABELLONE ===== */
+/* ===== DATABASE IDENTICO ===== */
 localforage.config({
   name: 'PorkysGame',
   storeName: 'mazzo_carte'
@@ -298,14 +315,15 @@ function estraiCarta() {
   }, 800);
 }
 
-function resetEstrazioni() {
+function resetPartita() {
   mazzo.forEach(c => c.estratta = false);
   resetCartaVisuale();
   aggiornaContatore();
   salvaCarte();
 }
 
-function cancellaMazzo() {
+/* ===== CANCELLA MAZZO (STESSO ID E FUNZIONE) ===== */
+document.getElementById("cancellaMazzoBtn").addEventListener("click", () => {
   customConfirm("Vuoi cancellare TUTTO il mazzo?")
     .then(ok => {
       if (!ok) return;
@@ -314,7 +332,7 @@ function cancellaMazzo() {
       resetCartaVisuale();
       aggiornaContatore();
     });
-}
+});
 
 /* ===== MODAL ===== */
 function customAlert(msg) {
@@ -341,6 +359,11 @@ function customConfirm(msg) {
     };
   });
 }
+
+/* ===== HOME PAGE IDENTICO AL TABELLONE ===== */
+document.getElementById("backBtn").addEventListener("click", () => {
+  window.location.href = "./index.html";
+});
 
 /* ===== AVVIO ===== */
 window.addEventListener("load", caricaCarte);
