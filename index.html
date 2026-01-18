@@ -11,149 +11,65 @@
 
 <title>Porky's Game - Carte</title>
 
-<!-- LIBRERIE IDENTICHE AL TABELLONE -->
 <script src="js/jszip.min.js"></script>
 <script src="js/localforage.min.js"></script>
 
 <style>
-
-/* ===== GRAFICA IDENTICA AL TABELLONE EXTREME ===== */
-
+/* ===== GRAFICA IDENTICA AL TABELLONE ===== */
 body {
   font-family: Arial, sans-serif;
   text-align: center;
   min-height: 100vh;
-
   background:
-    linear-gradient(
-      rgba(215, 175, 90, 0.85),
-      rgba(215, 175, 90, 0.85)
-    ),
-    url("images/logo_splash.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+    linear-gradient(rgba(215,175,90,.85), rgba(215,175,90,.85)),
+    url("images/logo_splash.png") center/cover no-repeat;
 }
 
-h1 {
-  margin-top: 18px;
-  font-size: 26px;
-  color: #502369;
-}
+h1 { color:#502369; margin-top:18px; }
 
-/* BOTTONI IDENTICI */
 button {
-  padding: 10px;
-  margin: 5px;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
+  padding:10px;
+  margin:5px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-.btn {
-  background: linear-gradient(145deg, #dfad24, #9b710e);
-  color: #3b2500;
-}
+.btn { background:linear-gradient(145deg,#dfad24,#9b710e); color:#3b2500; }
+.reset,.cancellaMazzo { background:linear-gradient(145deg,#b00b0b,#910101); color:#fff; }
 
-.btn:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
-
-.reset {
-  background: linear-gradient(145deg, #b00b0b, #910101);
-  color: #fff;
-}
-
-.reset:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
-
-.cancellaMazzo {
-  background: linear-gradient(145deg, #b00b0b, #910101);
-  color: #fff;
-}
-
-.cancellaMazzo:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03);
-}
-
-/* CARTA IDENTICA */
 .carta {
-  width: 180px;
-  height: 300px;
-  margin: 20px auto;
-  border-radius: 10px;
+  width:180px;height:300px;margin:20px auto;border-radius:10px;
   background:
-    radial-gradient(circle at top, rgba(255,215,120,.35), rgba(80,0,40,.9));
-  background-image: url('images/Nuovo_logo_carte.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 15px rgba(245,197,66,.4),
-              inset 0 0 10px rgba(0,0,0,.5);
+    radial-gradient(circle at top,rgba(255,215,120,.35),rgba(80,0,40,.9)),
+    url("images/Nuovo_logo_carte.png") center/cover no-repeat;
+  box-shadow:0 0 15px rgba(245,197,66,.4), inset 0 0 10px rgba(0,0,0,.5);
 }
 
-.carta img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
+.carta img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
 
-.shuffle {
-  animation: shake .5s infinite;
-}
-
+.shuffle { animation: shake .5s infinite; }
 @keyframes shake {
-  0%   { transform: rotateZ(0deg); }
-  25%  { transform: rotateY(180deg); }
-  50%  { transform: rotateX(-180deg); }
-  75%  { transform: rotateY(180deg); }
-  100% { transform: rotateZ(0deg); }
+  0%{transform:rotateZ(0)}25%{transform:rotateY(180deg)}
+  50%{transform:rotateX(-180deg)}75%{transform:rotateY(180deg)}
+  100%{transform:rotateZ(0)}
 }
 
-.info {
-  margin-top: 10px;
-  font-size: 18px;
-  color: #502369;
-  font-weight: bold;
-}
+.info { font-size:18px;color:#502369;font-weight:bold; }
 
-/* INPUT NASCOSTI */
-input[type="file"] {
-  display: none;
-}
+input[type=file]{display:none;}
 
-/* ===== MODAL IDENTICA AL TABELLONE ===== */
 #modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  display:none; align-items:center; justify-content:center; z-index:9999;
 }
-
 #modalBox {
-  background: #f9e0a7;
-  border: 4px solid #502369;
-  border-radius: 14px;
-  padding: 25px;
-  min-width: 280px;
-  text-align: center;
-  font-size: 18px;
-  color: #502369;
+  background:#f9e0a7; border:4px solid #502369;
+  border-radius:14px; padding:25px; min-width:280px;
+  color:#502369;
 }
-
 </style>
 </head>
 
@@ -163,18 +79,15 @@ input[type="file"] {
 
 <div>
   <button class="btn" onclick="apriZip()">Carica mazzo</button>
-  <button class="btn" onclick="document.getElementById('imgInput').click()">Aggiungi carte</button>
+  <button class="btn" onclick="imgInput.click()">Aggiungi carte</button>
 
   <input type="file" id="zipInput" accept=".zip" multiple>
-  <input type="file"
-         id="imgInput"
+  <input type="file" id="imgInput"
          accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
          multiple>
 </div>
 
-<div class="info">
-  Carte nel mazzo: <span id="contatore">0</span>
-</div>
+<div class="info">Carte nel mazzo: <span id="contatore">0</span></div>
 
 <div id="cartaEstratta" class="carta"></div>
 
@@ -186,18 +99,11 @@ input[type="file"] {
 
 <div style="margin-top:15px;">
   <button id="backBtn"
-          style="
-            padding:10px 15px;
-            background:#01893a;
-            color:white;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;">
+    style="padding:10px 15px;background:#01893a;color:white;border:none;border-radius:6px;">
     ⬅ Home Page
   </button>
 </div>
 
-<!-- MODAL -->
 <div id="modalOverlay">
   <div id="modalBox">
     <div id="modalText"></div><br>
@@ -207,14 +113,10 @@ input[type="file"] {
 </div>
 
 <script>
-
-/* ===== DATABASE IDENTICO ===== */
-localforage.config({
-  name: 'PorkysGame',
-  storeName: 'mazzo_carte'
-});
+localforage.config({ name:'PorkysGame', storeName:'mazzo_carte' });
 
 let mazzo = [];
+let mazzoCancellato = false;
 
 const zipInput = document.getElementById("zipInput");
 const imgInput = document.getElementById("imgInput");
@@ -222,152 +124,118 @@ const contatore = document.getElementById("contatore");
 const cartaEstratta = document.getElementById("cartaEstratta");
 
 /* ===== UTIL ===== */
-function aggiornaContatore() {
-  contatore.textContent = mazzo.filter(c => !c.estratta).length;
-}
+function aggiornaContatore(){ contatore.textContent = mazzo.filter(c=>!c.estratta).length; }
+function resetCarta(){ cartaEstratta.innerHTML=""; }
+async function salva(){ await localforage.setItem("mazzo", mazzo); }
 
-function resetCartaVisuale() {
-  cartaEstratta.innerHTML = "";
-}
-
-async function salvaCarte() {
-  await localforage.setItem("mazzo", mazzo);
-}
-
-async function caricaCarte() {
+async function caricaCarte(){
   const salvato = await localforage.getItem("mazzo");
-  if (Array.isArray(salvato)) {
+  if(Array.isArray(salvato) && salvato.length){
     mazzo = salvato;
+    mazzoCancellato = false;
     aggiornaContatore();
   }
+}
+
+/* ===== BLOCCO CARICAMENTO ===== */
+function checkCaricamento(){
+  if(mazzo.length && !mazzoCancellato){
+    customAlert("Devi prima cancellare il mazzo attuale");
+    return false;
+  }
+  return true;
 }
 
 /* ===== ZIP ===== */
-function apriZip() {
-  zipInput.value = "";
+function apriZip(){
+  if(!checkCaricamento()) return;
+  zipInput.value="";
   zipInput.click();
 }
 
-zipInput.addEventListener("change", async () => {
-  for (const file of zipInput.files) {
+zipInput.addEventListener("change", async ()=>{
+  for(const file of zipInput.files){
     const zip = await JSZip.loadAsync(file);
-    const immagini = Object.values(zip.files)
-      .filter(f => !f.dir && /\.(png|jpe?g|webp|gif)$/i.test(f.name));
-
-    for (const img of immagini) {
-      if (mazzo.some(c => c.nome === img.name)) continue;
+    const imgs = Object.values(zip.files)
+      .filter(f=>!f.dir && /\.(png|jpe?g|webp|gif)$/i.test(f.name));
+    for(const img of imgs){
       const base64 = await img.async("base64");
-      mazzo.push({
-        nome: img.name,
-        img: `data:image/png;base64,${base64}`,
-        estratta: false
-      });
+      mazzo.push({ nome:img.name, img:`data:image/png;base64,${base64}`, estratta:false });
     }
   }
-  await salvaCarte();
-  aggiornaContatore();
-  resetCartaVisuale();
+  mazzoCancellato = false;
+  await salva(); aggiornaContatore(); resetCarta();
 });
 
-/* ===== IMMAGINI MULTIPLE ===== */
-imgInput.addEventListener("change", async () => {
-  const files = [...imgInput.files];
+/* ===== IMMAGINI ===== */
+imgInput.addEventListener("change", async ()=>{
+  if(!checkCaricamento()) return;
 
-  const promises = files.map(file => new Promise(resolve => {
-    if (!file.type.startsWith("image/")) return resolve();
-    if (mazzo.some(c => c.nome === file.name)) return resolve();
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      mazzo.push({
-        nome: file.name,
-        img: e.target.result,
-        estratta: false
-      });
-      resolve();
-    };
-    reader.readAsDataURL(file);
-  }));
-
-  await Promise.all(promises);
-  await salvaCarte();
-  aggiornaContatore();
-  resetCartaVisuale();
+  for(const file of imgInput.files){
+    const r = new FileReader();
+    await new Promise(res=>{
+      r.onload=e=>{
+        mazzo.push({ nome:file.name, img:e.target.result, estratta:false });
+        res();
+      };
+      r.readAsDataURL(file);
+    });
+  }
+  mazzoCancellato = false;
+  await salva(); aggiornaContatore(); resetCarta();
 });
 
 /* ===== GIOCO ===== */
-function estraiCarta() {
-  const disponibili = mazzo.filter(c => !c.estratta);
-  if (!disponibili.length) {
-    customAlert("Tutte le carte sono state estratte!");
-    return;
-  }
-
+function estraiCarta(){
+  const disp = mazzo.filter(c=>!c.estratta);
+  if(!disp.length){ customAlert("Tutte le carte sono state estratte!"); return; }
   cartaEstratta.classList.add("shuffle");
-
-  setTimeout(() => {
+  setTimeout(()=>{
     cartaEstratta.classList.remove("shuffle");
-    const carta = disponibili[Math.floor(Math.random() * disponibili.length)];
-    carta.estratta = true;
-    cartaEstratta.innerHTML = `<img src="${carta.img}">`;
-    aggiornaContatore();
-    salvaCarte();
-  }, 800);
+    const c = disp[Math.floor(Math.random()*disp.length)];
+    c.estratta = true;
+    cartaEstratta.innerHTML=`<img src="${c.img}">`;
+    aggiornaContatore(); salva();
+  },800);
 }
 
-function resetPartita() {
-  mazzo.forEach(c => c.estratta = false);
-  resetCartaVisuale();
-  aggiornaContatore();
-  salvaCarte();
+function resetPartita(){
+  mazzo.forEach(c=>c.estratta=false);
+  resetCarta(); aggiornaContatore(); salva();
 }
 
-/* ===== CANCELLA MAZZO (STESSO ID E FUNZIONE) ===== */
-document.getElementById("cancellaMazzoBtn").addEventListener("click", () => {
+/* ===== CANCELLA ===== */
+document.getElementById("cancellaMazzoBtn").onclick=()=>{
   customConfirm("Vuoi cancellare TUTTO il mazzo?")
-    .then(ok => {
-      if (!ok) return;
-      mazzo = [];
-      localforage.removeItem("mazzo");
-      resetCartaVisuale();
-      aggiornaContatore();
-    });
-});
+  .then(ok=>{
+    if(!ok) return;
+    mazzo=[];
+    mazzoCancellato=true;
+    localforage.removeItem("mazzo");
+    resetCarta(); aggiornaContatore();
+  });
+};
 
 /* ===== MODAL ===== */
-function customAlert(msg) {
-  modalText.textContent = msg;
-  modalCancel.style.display = "none";
-  modalOverlay.style.display = "flex";
-  modalOk.onclick = () => {
-    modalOverlay.style.display = "none";
-    modalCancel.style.display = "inline-block";
-  };
+function customAlert(msg){
+  modalText.textContent=msg;
+  modalCancel.style.display="none";
+  modalOverlay.style.display="flex";
+  modalOk.onclick=()=>{ modalOverlay.style.display="none"; modalCancel.style.display="inline-block"; };
 }
-
-function customConfirm(msg) {
-  return new Promise(resolve => {
-    modalText.textContent = msg;
-    modalOverlay.style.display = "flex";
-    modalOk.onclick = () => {
-      modalOverlay.style.display = "none";
-      resolve(true);
-    };
-    modalCancel.onclick = () => {
-      modalOverlay.style.display = "none";
-      resolve(false);
-    };
+function customConfirm(msg){
+  return new Promise(res=>{
+    modalText.textContent=msg;
+    modalOverlay.style.display="flex";
+    modalOk.onclick=()=>{ modalOverlay.style.display="none"; res(true); };
+    modalCancel.onclick=()=>{ modalOverlay.style.display="none"; res(false); };
   });
 }
 
-/* ===== HOME PAGE IDENTICO AL TABELLONE ===== */
-document.getElementById("backBtn").addEventListener("click", () => {
-  window.location.href = "./index.html";
-});
+/* ===== HOME ===== */
+document.getElementById("backBtn").onclick=()=>location.href="./index.html";
 
-/* ===== AVVIO ===== */
 window.addEventListener("load", caricaCarte);
-
 </script>
 
 </body>
