@@ -2,39 +2,54 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               minimum-scale=0.5,
+               maximum-scale=3.0,
+               user-scalable=yes">
 
-<title>Gioco Carte – Estrazione</title>
+<title>Porky's Game – Carte</title>
 
-<!-- Librerie -->
+<!-- LIBRERIE -->
 <script src="js/jszip.min.js"></script>
 <script src="js/localforage.min.js"></script>
 
 <style>
+
+/* ===== STILE IDENTICO AL TABELLONE ===== */
+
 body {
   font-family: Arial, sans-serif;
-  background:
-    linear-gradient(rgba(20,10,0,.8), rgba(20,10,0,.8)),
-    url("images/Nuovo_logo_carte.png") center/cover no-repeat;
-  color: #f5e6b3;
   text-align: center;
   min-height: 100vh;
-  padding: 20px;
+
+  background:
+    linear-gradient(
+      rgba(215, 175, 90, 0.85),
+      rgba(215, 175, 90, 0.85)
+    ),
+    url("images/logo_splash.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 h1 {
-  color: #f5c542;
-  text-shadow: 0 0 10px rgba(245,197,66,.6);
+  margin-top: 18px;
+  font-size: 26px;
+  color: #502369;
 }
 
+/* BOTTONI IDENTICI */
 button {
-  padding: 10px 16px;
-  margin: 6px;
+  padding: 10px;
+  margin: 5px;
   font-size: 16px;
-  font-weight: bold;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
 }
 
 .btn {
@@ -42,40 +57,53 @@ button {
   color: #3b2500;
 }
 
+.btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+}
+
 .reset {
   background: linear-gradient(145deg, #b00b0b, #910101);
   color: #fff;
 }
 
-.info {
-  margin: 15px;
-  font-size: 18px;
+.reset:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
 }
 
+.cancellaMazzo {
+  background: linear-gradient(145deg, #b00b0b, #910101);
+  color: #fff;
+}
+
+/* CARTA IDENTICA */
 .carta {
-  width: 200px;
-  height: 320px;
+  width: 180px;
+  height: 300px;
   margin: 20px auto;
-  border-radius: 12px;
+  border-radius: 10px;
   background:
     radial-gradient(circle at top, rgba(255,215,120,.35), rgba(80,0,40,.9));
   background-image: url('images/Nuovo_logo_carte.png');
   background-size: cover;
   background-position: center;
-  box-shadow: 0 0 15px rgba(245,197,66,.4),
-              inset 0 0 10px rgba(0,0,0,.5);
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 15px rgba(245,197,66,.4),
+              inset 0 0 10px rgba(0,0,0,.5);
 }
 
 .carta img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
+/* ANIMAZIONE MESCOLA */
 .shuffle {
   animation: shake .5s infinite;
 }
@@ -88,11 +116,20 @@ button {
   100% { transform: rotateZ(0deg); }
 }
 
+/* INFO */
+.info {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #502369;
+  font-weight: bold;
+}
+
+/* INPUT NASCOSTI */
 input[type="file"] {
   display: none;
 }
 
-/* MODAL */
+/* ===== MODAL IDENTICA ===== */
 #modalOverlay {
   position: fixed;
   inset: 0;
@@ -100,41 +137,47 @@ input[type="file"] {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10000;
 }
+
 #modalBox {
   background: #f9e0a7;
   border: 4px solid #502369;
   border-radius: 14px;
   padding: 25px;
   min-width: 280px;
+  text-align: center;
+  font-size: 18px;
   color: #502369;
 }
+
 </style>
 </head>
 
 <body>
 
-<h1>Gioco di Estrazione Carte</h1>
+<h1>Porky's Game – Carte</h1>
 
 <div>
   <button class="btn" onclick="apriZip()">Carica mazzo (ZIP)</button>
   <button class="btn" onclick="imgInput.click()">Aggiungi carte</button>
 
   <input type="file" id="zipInput" accept=".zip" multiple>
-  <input type="file" id="imgInput" accept="image/*" multiple>
+  <input type="file" id="imgInput"
+         accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+         multiple>
 </div>
 
 <div class="info">
-  Carte disponibili: <span id="contatore">0</span>
+  Carte nel mazzo: <span id="contatore">0</span>
 </div>
 
 <div id="cartaEstratta" class="carta"></div>
 
 <div>
   <button class="btn" onclick="estraiCarta()">ESTRAI</button>
-  <button class="btn" onclick="resetEstrazioni()">RESET ESTRAZIONI</button>
-  <button class="reset" onclick="cancellaMazzo()">CANCELLA MAZZO</button>
+  <button class="btn" onclick="resetEstrazioni()">RESET</button>
+  <button class="cancellaMazzo" onclick="cancellaMazzo()">CANCELLA MAZZO</button>
 </div>
 
 <!-- MODAL -->
@@ -147,41 +190,42 @@ input[type="file"] {
 </div>
 
 <script>
-/* ================= DATABASE ================= */
+
+/* ===== DATABASE IDENTICO AL TABELLONE ===== */
 localforage.config({
-  name: 'GiocoCarte',
-  storeName: 'mazzo'
+  name: 'PorkysGame',
+  storeName: 'mazzo_carte'
 });
 
 let mazzo = [];
 
-const contatore = document.getElementById("contatore");
-const cartaEstratta = document.getElementById("cartaEstratta");
 const zipInput = document.getElementById("zipInput");
 const imgInput = document.getElementById("imgInput");
+const contatore = document.getElementById("contatore");
+const cartaEstratta = document.getElementById("cartaEstratta");
 
-/* ================= UTILS ================= */
+/* ===== UTIL ===== */
 function aggiornaContatore() {
   contatore.textContent = mazzo.filter(c => !c.estratta).length;
 }
 
-function resetCarta() {
+function resetCartaVisuale() {
   cartaEstratta.innerHTML = "";
 }
 
-async function salvaMazzo() {
+async function salvaCarte() {
   await localforage.setItem("mazzo", mazzo);
 }
 
-async function caricaMazzo() {
+async function caricaCarte() {
   const salvato = await localforage.getItem("mazzo");
-  if (salvato && Array.isArray(salvato)) {
+  if (Array.isArray(salvato)) {
     mazzo = salvato;
     aggiornaContatore();
   }
 }
 
-/* ================= ZIP ================= */
+/* ===== ZIP ===== */
 function apriZip() {
   zipInput.value = "";
   zipInput.click();
@@ -189,15 +233,12 @@ function apriZip() {
 
 zipInput.addEventListener("change", async () => {
   for (const file of zipInput.files) {
-    if (!file.name.endsWith(".zip")) continue;
-
     const zip = await JSZip.loadAsync(file);
     const immagini = Object.values(zip.files)
-      .filter(f => !f.dir && /\.(png|jpe?g|webp)$/i.test(f.name));
+      .filter(f => !f.dir && /\.(png|jpe?g|webp|gif)$/i.test(f.name));
 
     for (const img of immagini) {
       if (mazzo.some(c => c.nome === img.name)) continue;
-
       const base64 = await img.async("base64");
       mazzo.push({
         nome: img.name,
@@ -206,16 +247,18 @@ zipInput.addEventListener("change", async () => {
       });
     }
   }
-  await salvaMazzo();
+  await salvaCarte();
   aggiornaContatore();
-  resetCarta();
+  resetCartaVisuale();
 });
 
-/* ================= IMMAGINI ================= */
+/* ===== IMMAGINI MULTIPLE ===== */
 imgInput.addEventListener("change", async () => {
-  for (const file of imgInput.files) {
-    if (!file.type.startsWith("image/")) continue;
-    if (mazzo.some(c => c.nome === file.name)) continue;
+  const files = [...imgInput.files];
+
+  const promises = files.map(file => new Promise(resolve => {
+    if (!file.type.startsWith("image/")) return resolve();
+    if (mazzo.some(c => c.nome === file.name)) return resolve();
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -224,14 +267,18 @@ imgInput.addEventListener("change", async () => {
         img: e.target.result,
         estratta: false
       });
-      salvaMazzo();
-      aggiornaContatore();
+      resolve();
     };
     reader.readAsDataURL(file);
-  }
+  }));
+
+  await Promise.all(promises);
+  await salvaCarte();
+  aggiornaContatore();
+  resetCartaVisuale();
 });
 
-/* ================= GIOCO ================= */
+/* ===== GIOCO ===== */
 function estraiCarta() {
   const disponibili = mazzo.filter(c => !c.estratta);
   if (!disponibili.length) {
@@ -240,65 +287,64 @@ function estraiCarta() {
   }
 
   cartaEstratta.classList.add("shuffle");
+
   setTimeout(() => {
     cartaEstratta.classList.remove("shuffle");
     const carta = disponibili[Math.floor(Math.random() * disponibili.length)];
     carta.estratta = true;
     cartaEstratta.innerHTML = `<img src="${carta.img}">`;
     aggiornaContatore();
-    salvaMazzo();
-  }, 700);
+    salvaCarte();
+  }, 800);
 }
 
 function resetEstrazioni() {
   mazzo.forEach(c => c.estratta = false);
-  resetCarta();
+  resetCartaVisuale();
   aggiornaContatore();
-  salvaMazzo();
+  salvaCarte();
 }
 
 function cancellaMazzo() {
-  customConfirm("Vuoi cancellare tutto il mazzo?")
+  customConfirm("Vuoi cancellare TUTTO il mazzo?")
     .then(ok => {
       if (!ok) return;
       mazzo = [];
-      resetCarta();
-      aggiornaContatore();
       localforage.removeItem("mazzo");
+      resetCartaVisuale();
+      aggiornaContatore();
     });
 }
 
-/* ================= MODAL ================= */
+/* ===== MODAL ===== */
 function customAlert(msg) {
-  return new Promise(res => {
-    modalText.textContent = msg;
-    modalCancel.style.display = "none";
-    modalOverlay.style.display = "flex";
-    modalOk.onclick = () => {
-      modalOverlay.style.display = "none";
-      modalCancel.style.display = "inline-block";
-      res();
-    };
-  });
+  modalText.textContent = msg;
+  modalCancel.style.display = "none";
+  modalOverlay.style.display = "flex";
+  modalOk.onclick = () => {
+    modalOverlay.style.display = "none";
+    modalCancel.style.display = "inline-block";
+  };
 }
 
 function customConfirm(msg) {
-  return new Promise(res => {
+  return new Promise(resolve => {
     modalText.textContent = msg;
     modalOverlay.style.display = "flex";
     modalOk.onclick = () => {
       modalOverlay.style.display = "none";
-      res(true);
+      resolve(true);
     };
     modalCancel.onclick = () => {
       modalOverlay.style.display = "none";
-      res(false);
+      resolve(false);
     };
   });
 }
 
-/* ================= AVVIO ================= */
-window.addEventListener("load", caricaMazzo);
+/* ===== AVVIO ===== */
+window.addEventListener("load", caricaCarte);
+
 </script>
 
 </body>
